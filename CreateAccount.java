@@ -11,8 +11,8 @@ import javax.swing.Timer;
 public class CreateAccount extends JFrame {
 
     // Define colors for easy customization
-    private static final Color COLOR_BACKGROUND = new Color(30, 41, 59); // bg-slate-800
-    private static final Color COLOR_PANEL = new Color(255, 255, 255, 15); // rgba(255, 255, 255, 0.05) with more visibility
+    private static final Color COLOR_BACKGROUND = new Color(64, 64, 64); // Dark grayish background
+    private static final Color COLOR_PANEL = new Color(64, 64, 64, 50); // Match background with slight transparency
     private static final Color COLOR_TEXT = new Color(209, 213, 219); // text-gray-300
     private static final Color COLOR_BUTTON_SUBMIT = new Color(22, 163, 74); // bg-green-600
     private static final Color COLOR_BUTTON_SUBMIT_HOVER = new Color(21, 128, 61); // bg-green-700
@@ -32,35 +32,74 @@ public class CreateAccount extends JFrame {
     public CreateAccount() {
         setTitle("Create Account - PawTrack");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setExtendedState(JFrame.MAXIMIZED_BOTH); 
+        
+        // Initialize window properties first
+        setResizable(true);
         getContentPane().setBackground(COLOR_BACKGROUND);
-        setLayout(new GridLayout(1, 2, 32, 0)); 
-        getRootPane().setBorder(new EmptyBorder(16, 16, 16, 16));
+        
+        // Use GridLayout with proper spacing for better maximize behavior
+        setLayout(new GridLayout(1, 2, 20, 0)); // Small gap between panels for better separation
+        getRootPane().setBorder(new EmptyBorder(20, 20, 20, 20)); // Add consistent padding
+
+        // Add window state listener to handle maximize/restore properly
+        addWindowStateListener(new java.awt.event.WindowStateListener() {
+            @Override
+            public void windowStateChanged(java.awt.event.WindowEvent e) {
+                // Handle window state changes properly
+                if ((e.getNewState() & JFrame.MAXIMIZED_BOTH) == JFrame.MAXIMIZED_BOTH) {
+                    // Window is maximized
+                    System.out.println("Window maximized");
+                } else if ((e.getNewState() & JFrame.NORMAL) == JFrame.NORMAL) {
+                    // Window is restored to normal
+                    System.out.println("Window restored");
+                }
+                // Ensure the window repaints correctly after state change
+                repaint();
+                revalidate();
+            }
+        });
 
 
         add(createFormPanel());
-
-        // Right Panel (Info)
         add(createInfoPanel());
+        
+        // Proper window initialization sequence
+        pack(); // Let components determine their preferred size
+        setLocationRelativeTo(null); // Center the window
+        setExtendedState(JFrame.MAXIMIZED_BOTH); // Then maximize
     }
 
     private JComponent createFormPanel() {
         JPanel wrapper = new JPanel(new GridBagLayout());
-        wrapper.setOpaque(false);
+        wrapper.setOpaque(true); // Make opaque to prevent white showing through
+        wrapper.setBackground(COLOR_BACKGROUND); // Ensure background matches
+        wrapper.setBorder(new EmptyBorder(20, 20, 20, 20)); // Add padding around content
 
         RoundedPanel formPanel = new RoundedPanel(32, COLOR_PANEL);
         formPanel.setLayout(new GridBagLayout());
-        formPanel.setPreferredSize(new Dimension(450, 620));
+        // Set flexible sizing that adapts to window size
+        formPanel.setPreferredSize(new Dimension(480, 700)); // Slightly larger preferred size
+        formPanel.setMinimumSize(new Dimension(420, 650)); // Ensure minimum usable size
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0; // Allow horizontal expansion
         gbc.insets = new Insets(8, 40, 0, 40);
 
         // Logo
-        // --- IMPORTANT: REPLACE WITH YOUR ACTUAL LOGO PATH ---
-        JLabel logo = new RoundedImageLabel("https://placehold.co/96x96/FFFFFF/1E293B?text=PT", 96);
+        // --- ACTUAL LOGO PATH ---
+        String logoPath = "c:/Users/agust/Documents/Visual Studio Code/Paw Track Management/Paw-Track/image/PawTrack.png";
+        JLabel logo = new RoundedImageLabel(logoPath, 96);
         logo.setPreferredSize(new Dimension(96, 96));
+        logo.setMinimumSize(new Dimension(96, 96));
+        logo.setMaximumSize(new Dimension(96, 96));
+        
+        // Debug: Check if file exists
+        File logoFile = new File(logoPath);
+        System.out.println("Logo file exists: " + logoFile.exists());
+        System.out.println("Logo file path: " + logoPath);
+        
         gbc.gridy = 0;
         gbc.insets = new Insets(15, 40, 10, 40);
         formPanel.add(logo, gbc);
@@ -130,9 +169,12 @@ public class CreateAccount extends JFrame {
 
         // --- Buttons ---
         JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 16, 0));
-        buttonPanel.setOpaque(false);
+        buttonPanel.setOpaque(false); // Keep transparent to match form panel
+        buttonPanel.setBackground(COLOR_BACKGROUND); // Ensure consistent background
+        
         JButton submitButton = createStyledButton("SUBMIT", COLOR_BUTTON_SUBMIT, COLOR_BUTTON_SUBMIT_HOVER);
         submitButton.addActionListener(_ -> handleSubmit());
+        
         JButton backButton = createStyledButton("BACK", COLOR_BUTTON_BACK, COLOR_BUTTON_BACK_HOVER);
         backButton.addActionListener(_ -> {
             // Close create account window and return to login
@@ -154,14 +196,25 @@ public class CreateAccount extends JFrame {
         gbc.insets = new Insets(10, 40, 10, 40);
         formPanel.add(successMessage, gbc);
 
-        wrapper.add(formPanel);
+        // Add the form panel to wrapper with proper centering constraints
+        GridBagConstraints wrapperGbc = new GridBagConstraints();
+        wrapperGbc.gridx = 0;
+        wrapperGbc.gridy = 0;
+        wrapperGbc.weightx = 1.0;
+        wrapperGbc.weighty = 1.0;
+        wrapperGbc.anchor = GridBagConstraints.CENTER;
+        wrapperGbc.fill = GridBagConstraints.NONE; // Don't force expansion
+        wrapper.add(formPanel, wrapperGbc);
+        
         return wrapper;
     }
 
     private JComponent createInfoPanel() {
         JPanel infoWrapper = new JPanel();
-        infoWrapper.setOpaque(false);
+        infoWrapper.setOpaque(true); // Make opaque to prevent white showing through
+        infoWrapper.setBackground(COLOR_BACKGROUND); // Ensure background matches
         infoWrapper.setLayout(new BoxLayout(infoWrapper, BoxLayout.Y_AXIS));
+        infoWrapper.setBorder(new EmptyBorder(40, 30, 40, 30)); // Increased padding for better spacing
 
         // Top Panel
         RoundedPanel topPanel = new RoundedPanel(32, COLOR_PANEL);
@@ -169,8 +222,9 @@ public class CreateAccount extends JFrame {
         topPanel.setBorder(new EmptyBorder(24, 24, 24, 24));
         
         // --- IMPORTANT: REPLACE WITH YOUR ACTUAL IMAGE PATH ---
-        JLabel imageLabel = new RoundedImageLabel("https://placehold.co/600x400/a3e635/1E293B?text=Find+a+Friend", 24);
-        imageLabel.setPreferredSize(new Dimension(100, 150)); // Height is arbitrary here, layout manager will handle it
+        JLabel imageLabel = new RoundedImageLabel("c:/Users/agust/Documents/Visual Studio Code/Paw Track Management/Paw-Track/image/DOG.png", 24);
+        imageLabel.setPreferredSize(new Dimension(100, 200)); // Increased height for better proportion
+        imageLabel.setMinimumSize(new Dimension(80, 120)); // Minimum size for small screens
         topPanel.add(imageLabel, BorderLayout.NORTH);
 
         JTextArea topText = new JTextArea(
@@ -362,6 +416,8 @@ class RoundedTextField extends JTextField {
         setForeground(new Color(31, 41, 55));
         setBorder(new EmptyBorder(12, 18, 12, 18));
         setFont(new Font("Inter", Font.PLAIN, 14));
+        setPreferredSize(new Dimension(300, 45)); // Ensure consistent sizing
+        setMinimumSize(new Dimension(250, 40));
     }
 
     @Override
@@ -383,6 +439,8 @@ class RoundedPasswordField extends JPasswordField {
         setForeground(new Color(31, 41, 55));
         setBorder(new EmptyBorder(12, 18, 12, 18));
         setFont(new Font("Inter", Font.PLAIN, 14));
+        setPreferredSize(new Dimension(300, 45)); // Ensure consistent sizing
+        setMinimumSize(new Dimension(250, 40));
     }
 
     @Override
@@ -408,9 +466,16 @@ class RoundedImageLabel extends JLabel {
             } else {
                 this.image = ImageIO.read(new File(path));
             }
+            if (image != null) {
+                System.out.println("Image loaded successfully: " + path + 
+                    " (Size: " + image.getWidth(null) + "x" + image.getHeight(null) + ")");
+            }
         } catch (IOException e) {
-            setText("Image not found");
+            setText("🐾 PT");
             setHorizontalAlignment(SwingConstants.CENTER);
+            setVerticalAlignment(SwingConstants.CENTER);
+            setForeground(Color.WHITE);
+            setFont(new Font("Arial", Font.BOLD, 24));
             System.err.println("Could not load image from: " + path);
             this.image = null;
         }
@@ -422,10 +487,33 @@ class RoundedImageLabel extends JLabel {
         if (image != null) {
             Graphics2D g2d = (Graphics2D) g.create();
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             
-            RoundRectangle2D roundRect = new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), cornerRadius, cornerRadius);
-            g2d.setClip(roundRect);
-            g2d.drawImage(image, 0, 0, getWidth(), getHeight(), this);
+            // Get component dimensions
+            int componentWidth = getWidth();
+            int componentHeight = getHeight();
+            
+            if (componentWidth > 0 && componentHeight > 0) {
+                // Calculate scaling to fit within component while maintaining aspect ratio
+                int imageWidth = image.getWidth(null);
+                int imageHeight = image.getHeight(null);
+                
+                double scaleX = (double) componentWidth / imageWidth;
+                double scaleY = (double) componentHeight / imageHeight;
+                double scale = Math.min(scaleX, scaleY);
+                
+                int newWidth = (int) (imageWidth * scale);
+                int newHeight = (int) (imageHeight * scale);
+                int x = (componentWidth - newWidth) / 2;
+                int y = (componentHeight - newHeight) / 2;
+                
+                // Create rounded rectangle clip
+                RoundRectangle2D roundRect = new RoundRectangle2D.Float(0, 0, componentWidth, componentHeight, cornerRadius, cornerRadius);
+                g2d.setClip(roundRect);
+                
+                // Draw the scaled and centered image
+                g2d.drawImage(image, x, y, newWidth, newHeight, this);
+            }
             g2d.dispose();
         } else {
             super.paintComponent(g);
@@ -446,12 +534,15 @@ class RoundedButton extends JButton {
         setFont(new Font("Inter", Font.BOLD, 14));
         setForeground(Color.WHITE);
         setCursor(new Cursor(Cursor.HAND_CURSOR));
-        setPreferredSize(new Dimension(100, 45));
+        setPreferredSize(new Dimension(120, 45)); // Slightly wider for better text fit
+        setMinimumSize(new Dimension(100, 40));
+        setMaximumSize(new Dimension(150, 50));
         
         // Remove default button painting
         setBorderPainted(false);
         setFocusPainted(false);
         setContentAreaFilled(false);
+        setOpaque(false);
     }
 
     @Override
@@ -467,10 +558,15 @@ class RoundedButton extends JButton {
         }
 
         // Paint the rounded background
-        g2d.fillRoundRect(0, 0, getWidth(), getHeight(), getHeight(), getHeight());
+        g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25); // More rounded corners
         
-        // Let the parent class (JButton) paint the text on top
-        super.paintComponent(g);
+        // Draw the text manually for better control
+        g2d.setColor(getForeground());
+        g2d.setFont(getFont());
+        FontMetrics fm = g2d.getFontMetrics();
+        int textX = (getWidth() - fm.stringWidth(getText())) / 2;
+        int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
+        g2d.drawString(getText(), textX, textY);
         
         g2d.dispose();
     }

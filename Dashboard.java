@@ -67,9 +67,9 @@ public class Dashboard extends JFrame {
             logoLabel.setPreferredSize(new Dimension(100, 120));
             logoLabel.setMinimumSize(new Dimension(100, 120));
             logoLabel.setMaximumSize(new Dimension(100, 120));
-            System.out.println("Logo loaded successfully from: " + logoPath); // Debug message
+            System.out.println("Logo loaded successfully from: " + logoPath);
         } else {
-            // Fallback text if the image is not found at the specified path
+   
             logoLabel = new JLabel("PawTrack Logo");
             logoLabel.setForeground(TEXT_COLOR);
             logoLabel.setFont(new Font("Arial", Font.BOLD, 24));
@@ -77,23 +77,23 @@ public class Dashboard extends JFrame {
             logoLabel.setMinimumSize(new Dimension(120, 120));
             logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
             logoLabel.setVerticalAlignment(SwingConstants.CENTER);
-            System.err.println("Logo file not found at: " + logoPath); // Error message for console
+            System.err.println("Logo file not found at: " + logoPath); 
         }
         
         logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        logoLabel.setBorder(new EmptyBorder(0, 0, 40, 0)); // Bottom margin for the logo
+        logoLabel.setBorder(new EmptyBorder(0, 0, 40, 0));
         sidebar.add(logoLabel);
         
-        // --- Navigation Buttons ---
+    
         sidebar.add(createSidebarButton("🐾 Paw", "PAW_PANEL"));
         sidebar.add(Box.createRigidArea(new Dimension(0, 10))); // Spacer
-        sidebar.add(createSidebarButton("📜 License", "LICENSE_PANEL"));
+        sidebar.add(createSidebarButton("📜 Vet", "LICENSE_PANEL"));
         sidebar.add(Box.createRigidArea(new Dimension(0, 10))); // Spacer
         sidebar.add(createSidebarButton("🛠️ Support", "SUPPORT_PANEL"));
         sidebar.add(Box.createRigidArea(new Dimension(0, 10))); // Spacer
         sidebar.add(createSidebarButton("📞 Contact", "CONTACT_PANEL"));
         sidebar.add(Box.createRigidArea(new Dimension(0, 10))); // Spacer
-        sidebar.add(createSidebarButton("ℹ️ About Us", "ABOUT_PANEL"));
+        sidebar.add(createSidebarButton("About Us !", "ABOUT_PANEL"));
     }
 
     /**
@@ -119,7 +119,7 @@ public class Dashboard extends JFrame {
             BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
             BorderFactory.createEmptyBorder(2, 2, 2, 2)
         ));
-        searchFieldPanel.setPreferredSize(new Dimension(320, 35));
+        searchFieldPanel.setPreferredSize(new Dimension(320, 30));
         
         // Search icon label
         JLabel searchIcon = new JLabel("🔍");
@@ -234,7 +234,7 @@ public class Dashboard extends JFrame {
 
         // Create a separate panel for each navigation item
         mainContent.add(new PawManagement(), "PAW_PANEL"); // Use actual PawManagement component
-        mainContent.add(createContentPanel("License Information"), "LICENSE_PANEL");
+        mainContent.add(new VetAppointment(), "LICENSE_PANEL"); // Use actual VetAppointment component
         mainContent.add(createContentPanel("Support Center"), "SUPPORT_PANEL");
         mainContent.add(createContentPanel("Contact Us"), "CONTACT_PANEL");
         mainContent.add(createContentPanel("About Our Company"), "ABOUT_PANEL");

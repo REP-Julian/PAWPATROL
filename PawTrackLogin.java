@@ -129,7 +129,7 @@ public class PawTrackLogin extends JFrame {
         gbc.insets = new Insets(5, 35, 10, 35);
         formPanel.add(linksPanel, gbc);
 
-        JLabel watermarkLabel = new JLabel("WATERMARK");
+        JLabel watermarkLabel = new JLabel(" © All Right Reserved");
         watermarkLabel.setFont(new Font("Inter", Font.PLAIN, 10));
         watermarkLabel.setForeground(COLOR_PLACEHOLDER);
         watermarkLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -165,7 +165,7 @@ public class PawTrackLogin extends JFrame {
         descriptionPanel.add(descTitle, BorderLayout.NORTH);
 
         JTextArea descriptionArea = new JTextArea(
-            "The PawPatrol System is a digital platform designed to help abandoned and " +
+            "The Paul Track System is a digital platform designed to help abandoned and " +
             "surrendered pets find new, loving homes. It connects individuals who can no " +
             "longer care for their pets with responsible adopters who are ready to welcome " +
             "them as part of their family. Through the system, users can view available pets, " +
@@ -231,7 +231,7 @@ public class PawTrackLogin extends JFrame {
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        button.setPreferredSize(new Dimension(100, 45));
+        button.setPreferredSize(new Dimension(100, 45));    
 
         button.addMouseListener(new MouseAdapter() {
             @Override

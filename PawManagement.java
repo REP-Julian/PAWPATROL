@@ -24,15 +24,15 @@ public class PawManagement extends JPanel {
         // --- Sample Data ---
         // In a real application, this data would be loaded from a database or API.
         String[][] petData = {
-            {"Buddy", "Available", "c:/path/to/buddy.png"},
-            {"Lucy", "Adopted", "c:/path/to/lucy.png"},
-            {"Max", "Available", "c:/path/to/max.png"},
-            {"Daisy", "Available", "c:/path/to/daisy.png"},
-            {"Charlie", "In Foster", "c:/path/to/charlie.png"},
-            {"Sadie", "Available", "c:/path/to/sadie.png"},
-            {"Rocky", "Adopted", "c:/path/to/rocky.png"},
-            {"Molly", "Available", "c:/path/to/molly.png"},
-            {"Zoe", "Available", "c:/path/to/zoe.png"}
+            {"Paul", "Available", "c:/Users/agust/Documents/Visual Studio Code/Paw Track Management/Paw-Track/image/DOG.png"},
+            {"Lucy", "Adopted", "c:/Users/agust/Documents/Visual Studio Code/Paw Track Management/Paw-Track/image/DOG.png"},
+            {"Max", "Available", "c:/Users/agust/Documents/Visual Studio Code/Paw Track Management/Paw-Track/image/DOG.png"},
+            {"Daisy", "Available", "c:/Users/agust/Documents/Visual Studio Code/Paw Track Management/Paw-Track/image/DOG.png"},
+            {"Charlie", "In Foster", "c:/Users/agust/Documents/Visual Studio Code/Paw Track Management/Paw-Track/image/DOG.png"},
+            {"Sadie", "Available", "c:/Users/agust/Documents/Visual Studio Code/Paw Track Management/Paw-Track/image/DOG.png"},
+            {"Rocky", "Adopted", "c:/Users/agust/Documents/Visual Studio Code/Paw Track Management/Paw-Track/image/DOG.png"},
+            {"Molly", "Available", "c:/Users/agust/Documents/Visual Studio Code/Paw Track Management/Paw-Track/image/DOG.png"},
+            {"Zoe", "Available", "c:/Users/agust/Documents/Visual Studio Code/Paw Track Management/Paw-Track/image/DOG.png"}
         };
 
         // --- Create and add pet cards to the grid ---
