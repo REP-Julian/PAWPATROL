@@ -28,9 +28,11 @@ public class VetAppointment extends JPanel {
 
     // Form components to be accessed for clearing
     private JTextField petNameField, petTypeField, ageBreedField;
-    private JComboBox<String> vetSelector;
-    private JFormattedTextField dateField, contactNumberField;
+    private JTextField petIdField, ownerNameField, petWeightField, emergencyContactField;
+    private JComboBox<String> vetSelector, genderComboBox;
+    private JFormattedTextField dateField, contactNumberField, lastVaccinationField;
     private JSpinner timeSpinner;
+    private JTextArea medicalHistoryArea, allergiesArea;
 
     public VetAppointment() {
         setBackground(BG_COLOR);
@@ -87,7 +89,11 @@ public class VetAppointment extends JPanel {
         panel.setBackground(BG_COLOR);
         panel.setAlignmentX(Component.LEFT_ALIGNMENT); // Force left alignment
 
-        panel.add(createSectionPanel("Pet Details", createPetDetailsFields()));
+        // Create Pet Details section with scrolling
+        JPanel petDetailsPanel = createPetDetailsFields();
+        JPanel petDetailsSection = createScrollableSectionPanel("Pet Details", petDetailsPanel, 300);
+        panel.add(petDetailsSection);
+        
         panel.add(Box.createRigidArea(new Dimension(0, 20))); // Reduced spacing
         panel.add(createSectionPanel("Appointment Details", createAppointmentDetailsFields()));
         
@@ -118,33 +124,145 @@ public class VetAppointment extends JPanel {
         return section;
     }
 
+    private JPanel createScrollableSectionPanel(String title, JPanel fieldsPanel, int maxHeight) {
+        JPanel section = new JPanel(new BorderLayout());
+        section.setBackground(SECTION_BG_COLOR);
+        section.setAlignmentX(Component.LEFT_ALIGNMENT); // Force left alignment
+        
+        Border lineBorder = new LineBorder(BORDER_COLOR, 1);
+        Border emptyBorder = new EmptyBorder(16, 16, 16, 16); // Reduced padding
+
+        TitledBorder titledBorder = BorderFactory.createTitledBorder(
+            new CompoundBorder(lineBorder, emptyBorder),
+            title,
+            TitledBorder.DEFAULT_JUSTIFICATION,
+            TitledBorder.DEFAULT_POSITION,
+            FONT_TITLE,
+            TEXT_COLOR
+        );
+        section.setBorder(titledBorder);
+        
+        // Create scroll pane for the fields
+        JScrollPane scrollPane = new JScrollPane(fieldsPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setBorder(null); // Remove border as it's handled by the section
+        scrollPane.setBackground(SECTION_BG_COLOR);
+        scrollPane.getViewport().setBackground(SECTION_BG_COLOR);
+        
+        // Configure smooth scrolling
+        configureScrollPaneForSmoothScrolling(scrollPane);
+        
+        // Set preferred size to control when scrolling kicks in
+        scrollPane.setPreferredSize(new Dimension(0, maxHeight));
+        scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, maxHeight));
+        
+        section.add(scrollPane, BorderLayout.CENTER);
+        return section;
+    }
+
     private JPanel createPetDetailsFields() {
         JPanel fields = new JPanel(new GridBagLayout());
         fields.setOpaque(false);
         GridBagConstraints gbc = createGbc();
 
-        // Pet Name (full width, properly aligned)
+        // Pet ID & Owner Name (first row)
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.5;
+        petIdField = createTextField();
+        addField(fields, gbc, "Pet ID", petIdField);
+        
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.5;
+        ownerNameField = createTextField();
+        addField(fields, gbc, "Owner Name", ownerNameField);
+
+        // Pet Name (second row, full width)
+        gbc.gridx = 0;
+        gbc.gridy = 2;
         gbc.gridwidth = 2;
         gbc.weightx = 1.0;
         petNameField = createTextField();
         addField(fields, gbc, "Pet Name", petNameField);
         
-        // Pet Type & Age/Breed (side by side, properly aligned)
+        // Pet Type & Age/Breed (third row)
         gbc.gridx = 0;
-        gbc.gridy = 2; // Skip past the pet name field
+        gbc.gridy = 4;
         gbc.gridwidth = 1;
         gbc.weightx = 0.5;
         petTypeField = createTextField();
         addField(fields, gbc, "Pet Type", petTypeField);
         
         gbc.gridx = 1;
-        gbc.gridy = 2; // Same row as pet type
+        gbc.gridy = 4;
         gbc.gridwidth = 1;
         gbc.weightx = 0.5;
         ageBreedField = createTextField();
         addField(fields, gbc, "Age/Breed", ageBreedField);
+
+        // Gender & Pet Weight (fourth row)
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.5;
+        String[] genders = {"Male", "Female", "Neutered Male", "Spayed Female"};
+        genderComboBox = new JComboBox<>(genders);
+        styleComboBox(genderComboBox);
+        addField(fields, gbc, "Gender", genderComboBox);
+        
+        gbc.gridx = 1;
+        gbc.gridy = 6;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.5;
+        petWeightField = createTextField();
+        addField(fields, gbc, "Pet Weight (kg)", petWeightField);
+
+        // Last Vaccination Date & Emergency Contact (fifth row)
+        gbc.gridx = 0;
+        gbc.gridy = 8;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.5;
+        lastVaccinationField = createDateField();
+        addField(fields, gbc, "Last Vaccination", createFieldWithIcon(lastVaccinationField, "💉"));
+        
+        gbc.gridx = 1;
+        gbc.gridy = 8;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.5;
+        emergencyContactField = createTextField();
+        addField(fields, gbc, "Emergency Contact", emergencyContactField);
+
+        // Medical History (sixth row, full width)
+        gbc.gridx = 0;
+        gbc.gridy = 10;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
+        medicalHistoryArea = createTextArea(3);
+        JScrollPane medicalHistoryScroll = new JScrollPane(medicalHistoryArea);
+        medicalHistoryScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        medicalHistoryScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        medicalHistoryScroll.setBorder(new LineBorder(BORDER_COLOR, 1));
+        // Configure smooth scrolling for medical history
+        configureScrollPaneForSmoothScrolling(medicalHistoryScroll);
+        addField(fields, gbc, "Medical History", medicalHistoryScroll);
+
+        // Allergies (seventh row, full width)
+        gbc.gridx = 0;
+        gbc.gridy = 12;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
+        allergiesArea = createTextArea(2);
+        JScrollPane allergiesScroll = new JScrollPane(allergiesArea);
+        allergiesScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        allergiesScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        allergiesScroll.setBorder(new LineBorder(BORDER_COLOR, 1));
+        // Configure smooth scrolling for allergies
+        configureScrollPaneForSmoothScrolling(allergiesScroll);
+        addField(fields, gbc, "Known Allergies", allergiesScroll);
 
         return fields;
     }
@@ -263,6 +381,7 @@ public class VetAppointment extends JPanel {
     }
 
     private void clearForm() {
+        // Clear existing fields
         petNameField.setText("");
         petTypeField.setText("");
         ageBreedField.setText("");
@@ -270,6 +389,16 @@ public class VetAppointment extends JPanel {
         dateField.setValue(null); // Clears the formatted text field
         timeSpinner.setValue(new Date()); // Reset time to current
         contactNumberField.setValue(null);
+        
+        // Clear new pet detail fields
+        petIdField.setText("");
+        ownerNameField.setText("");
+        petWeightField.setText("");
+        emergencyContactField.setText("");
+        genderComboBox.setSelectedIndex(0);
+        lastVaccinationField.setValue(null);
+        medicalHistoryArea.setText("");
+        allergiesArea.setText("");
     }
     
     // --- Helper and Styling Methods ---
@@ -283,6 +412,7 @@ public class VetAppointment extends JPanel {
         card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 160));
         return card;
     }
+
     
     private JLabel createCardLabel(String text, Font font) {
         JLabel label = new JLabel(text);
@@ -329,6 +459,16 @@ public class VetAppointment extends JPanel {
         textField.setBackground(INPUT_BG_COLOR);
         textField.setBorder(new CompoundBorder(new LineBorder(BORDER_COLOR, 1), new EmptyBorder(10, 10, 10, 10)));
         return textField;
+    }
+
+    private JTextArea createTextArea(int rows) {
+        JTextArea textArea = new JTextArea(rows, 0);
+        textArea.setFont(FONT_INPUT);
+        textArea.setBackground(INPUT_BG_COLOR);
+        textArea.setBorder(new EmptyBorder(10, 10, 10, 10));
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        return textArea;
     }
 
     private JFormattedTextField createDateField() {
@@ -403,6 +543,17 @@ public class VetAppointment extends JPanel {
         button.setFocusPainted(false);
         button.setBorder(new EmptyBorder(12, 24, 12, 24));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+
+    private void configureScrollPaneForSmoothScrolling(JScrollPane scrollPane) {
+        // Configure smooth scrolling behavior
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Smooth scroll increment
+        scrollPane.getVerticalScrollBar().setBlockIncrement(64); // Page scroll increment
+        scrollPane.setWheelScrollingEnabled(true); // Enable mouse wheel scrolling
+        
+        // Optional: Style the scroll bar for better appearance
+        scrollPane.getVerticalScrollBar().setBackground(SECTION_BG_COLOR);
+        scrollPane.getVerticalScrollBar().setForeground(BORDER_COLOR);
     }
 
     // Main method to allow running this panel as a standalone application

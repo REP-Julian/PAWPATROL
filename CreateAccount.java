@@ -299,8 +299,8 @@ public class CreateAccount extends JFrame {
         if (username.isEmpty()) {
             usernameError.setText("Username is required.");
             isValid = false;
-        } else if (username.length() < 3) {
-            usernameError.setText("Username must be at least 3 characters.");
+        } else if (username.length() < 8) {
+            usernameError.setText("Username must be at least 8 characters.");
             isValid = false;
         } else if (!username.matches("^[a-zA-Z0-9_]+$")) {
             usernameError.setText("Username can only contain letters, numbers, and underscores.");
@@ -462,7 +462,7 @@ class RoundedImageLabel extends JLabel {
         this.cornerRadius = cornerRadius;
         try {
             if (path.startsWith("http")) {
-                this.image = ImageIO.read(new java.net.URL(path));
+                this.image = ImageIO.read(java.net.URI.create(path).toURL());
             } else {
                 this.image = ImageIO.read(new File(path));
             }

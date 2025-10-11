@@ -128,13 +128,13 @@ public class Dashboard extends JFrame {
         searchIcon.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 5));
         
         // Search text field
-        JTextField searchField = new JTextField();
+        final JTextField searchField = new JTextField(); // Make final so it can be accessed in inner classes
         searchField.setFont(new Font("SansSerif", Font.PLAIN, 14));
         searchField.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 10));
         searchField.setBackground(Color.WHITE);
         
         // Add placeholder text functionality
-        String placeholder = "Search paws, licenses, or contacts...";
+        final String placeholder = "Search paws, licenses, or contacts..."; // Make final for inner class access
         searchField.setText(placeholder);
         searchField.setForeground(Color.GRAY);
         
@@ -173,6 +173,52 @@ public class Dashboard extends JFrame {
         
         searchPanel.add(searchFieldPanel);
 
+        // --- Add Search Button ---
+        JButton searchButton = new JButton("🔍 Search");
+        searchButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        searchButton.setBackground(new Color(40, 167, 69)); // Green color
+        searchButton.setForeground(Color.WHITE);
+        searchButton.setFocusPainted(false);
+        searchButton.setBorder(new EmptyBorder(8, 15, 8, 15));
+        searchButton.setPreferredSize(new Dimension(100, 30));
+        
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String searchText = searchField.getText();
+                if (!searchText.equals(placeholder) && !searchText.trim().isEmpty()) {
+                    performSearch(searchText);
+                } else {
+                    JOptionPane.showMessageDialog(Dashboard.this, 
+                        "Please enter something to search for.",
+                        "Search", 
+                        JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        });
+        
+        searchPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
+        searchPanel.add(searchButton);
+
+        // --- Add New Button ---
+        JButton addNewButton = new JButton("🏠 Adoption");  // Changed from "➕ Adoption" to "🏠 Adoption"
+        addNewButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        addNewButton.setBackground(new Color(0, 123, 255)); // Blue color
+        addNewButton.setForeground(Color.WHITE);
+        addNewButton.setFocusPainted(false);
+        addNewButton.setBorder(new EmptyBorder(8, 15, 8, 15));
+        addNewButton.setPreferredSize(new Dimension(110, 30));
+        
+        addNewButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                handleAddNew();
+            }
+        });
+        
+        searchPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add spacing
+        searchPanel.add(addNewButton);
+
         // --- Logout Button ---
         JButton logoutButton = new JButton("🚪 Logout");
         logoutButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
@@ -192,6 +238,112 @@ public class Dashboard extends JFrame {
         // Add components to header
         headerPanel.add(searchPanel, BorderLayout.WEST);
         headerPanel.add(logoutButton, BorderLayout.EAST);
+    }
+
+    /**
+     * Handles the adoption button click by opening the AdoptionForm
+     */
+    protected void handleAddNew() {
+        // Find and disable the adoption button to prevent multiple clicks
+        JButton adoptionButton = findAdoptionButton();
+        if (adoptionButton != null) {
+            adoptionButton.setEnabled(false);
+        }
+        
+        try {
+            // Create a new JFrame for the adoption form
+            JFrame adoptionFrame = new JFrame("Adoption Form - Paw Track Management");
+            adoptionFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            
+            // Create our FormCanvas from AdoptionForm
+            FormCanvas formCanvas = new FormCanvas();
+            
+            // Create a JScrollPane and add the canvas to it
+            JScrollPane scrollPane = new JScrollPane(formCanvas);
+            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Set scroll speed
+            
+            // Add the scroll pane to the frame
+            adoptionFrame.add(scrollPane);
+            
+            // Set window properties
+            adoptionFrame.setSize(1220, 940);
+            adoptionFrame.setLocationRelativeTo(this); // Center relative to dashboard
+            adoptionFrame.setResizable(true);
+            
+            // Add window listener to handle window events
+            adoptionFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                    returnToDashboard(adoptionButton);
+                }
+                
+                @Override
+                public void windowClosed(java.awt.event.WindowEvent windowEvent) {
+                    returnToDashboard(adoptionButton);
+                }
+            });
+            
+            // Hide dashboard and show adoption form
+            this.setVisible(false);
+            adoptionFrame.setVisible(true);
+            
+        } catch (Exception e) {
+            System.err.println("Error opening adoption form: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Show error message and re-enable button
+            JOptionPane.showMessageDialog(this, 
+                "Error opening adoption form: " + e.getMessage(),
+                "Error", 
+                JOptionPane.ERROR_MESSAGE);
+                
+            if (adoptionButton != null) {
+                adoptionButton.setEnabled(true);
+            }
+        }
+    }
+    
+    /**
+     * Helper method to find the adoption button in the header panel
+     */
+    private JButton findAdoptionButton() {
+        return findButtonInPanel(headerPanel, "Adoption");
+    }
+    
+    /**
+     * Recursively searches for a button with the specified text in a container
+     */
+    private JButton findButtonInPanel(Container container, String buttonText) {
+        for (Component comp : container.getComponents()) {
+            if (comp instanceof JButton) {
+                JButton button = (JButton) comp;
+                if (button.getText().contains(buttonText)) {
+                    return button;
+                }
+            } else if (comp instanceof Container) {
+                JButton found = findButtonInPanel((Container) comp, buttonText);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Returns to dashboard and re-enables the adoption button
+     */
+    private void returnToDashboard(JButton adoptionButton) {
+        SwingUtilities.invokeLater(() -> {
+            this.setVisible(true);
+            if (adoptionButton != null) {
+                adoptionButton.setEnabled(true);
+            }
+            this.toFront(); // Bring dashboard to front
+            this.requestFocus(); // Request focus
+        });
     }
 
     /**
@@ -219,8 +371,16 @@ public class Dashboard extends JFrame {
             // Close the current dashboard
             this.dispose();
             
-            // Return to login screen
-            SwingUtilities.invokeLater(() -> new PawTrackLogin().setVisible(true));
+            // Return to login screen with error handling
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    new PawTrackLogin().setVisible(true);
+                } catch (Exception e) {
+                    System.err.println("PawTrackLogin class not found: " + e.getMessage());
+                    // Exit the application if login screen is not available
+                    System.exit(0);
+                }
+            });
         }
     }
 
@@ -232,12 +392,30 @@ public class Dashboard extends JFrame {
         mainContent = new JPanel(cardLayout);
         mainContent.setBackground(MAIN_BACKGROUND);
 
-        // Create a separate panel for each navigation item
-        mainContent.add(new PawManagement(), "PAW_PANEL"); // Use actual PawManagement component
-        mainContent.add(new VetAppointment(), "LICENSE_PANEL"); // Use actual VetAppointment component
+        // Create panels with error handling for missing classes
+        try {
+            mainContent.add(new PawManagement(), "PAW_PANEL");
+        } catch (Exception e) {
+            System.err.println("PawManagement class not found, using placeholder");
+            mainContent.add(createContentPanel("Paw Management"), "PAW_PANEL");
+        }
+        
+        try {
+            mainContent.add(new VetAppointment(), "LICENSE_PANEL");
+        } catch (Exception e) {
+            System.err.println("VetAppointment class not found, using placeholder");
+            mainContent.add(createContentPanel("Vet Appointments"), "LICENSE_PANEL");
+        }
+        
         mainContent.add(createContentPanel("Support Center"), "SUPPORT_PANEL");
         mainContent.add(createContentPanel("Contact Us"), "CONTACT_PANEL");
-        mainContent.add(createContentPanel("About Our Company"), "ABOUT_PANEL");
+        
+        try {
+            mainContent.add(AboutUs.createAboutUsPanel(), "ABOUT_PANEL");
+        } catch (Exception e) {
+            System.err.println("AboutUs class not found, using placeholder");
+            mainContent.add(createContentPanel("About Us"), "ABOUT_PANEL");
+        }
     }
 
     /**
@@ -375,4 +553,3 @@ class RoundedImageComponent extends JLabel {
         }
     }
 }
-
